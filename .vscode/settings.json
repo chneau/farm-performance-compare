@@ -1,13 +1,13 @@
 {
-  "cSpell.words": [
-    "clsx",
-    "echarts",
-    "farmfe",
-    "pmmmwh",
-    "prerendered",
-    "rspack",
-    "turbopack",
-    "umijs"
-  ],
-  "editor.inlineSuggest.showToolbar": "always"
+	"cSpell.words": [
+		"clsx",
+		"echarts",
+		"farmfe",
+		"pmmmwh",
+		"prerendered",
+		"rspack",
+		"turbopack",
+		"umijs"
+	],
+	"editor.inlineSuggest.showToolbar": "always"
 }

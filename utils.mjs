@@ -1,15 +1,15 @@
-import { Logger as DefaultLogger } from "@farmfe/core";
 import { rmSync, statSync } from "node:fs";
 import path from "node:path";
+import { Logger as DefaultLogger } from "@farmfe/core";
 import puppeteer from "puppeteer";
 
-const logger = new DefaultLogger({name: "Benchmark"});
+const logger = new DefaultLogger({ name: "Benchmark" });
 export async function getChartPic(data) {
-  const browser = await puppeteer.launch({ headless: "new" });
-  const chartTypes = ["full", "hmr", "startup", "build"];
-  async function generateChartPage(chartData) {
-    const page = await browser.newPage();
-    await page.setContent(`
+	const browser = await puppeteer.launch({ headless: "new" });
+	const chartTypes = ["full", "hmr", "startup", "build"];
+	async function generateChartPage(chartData) {
+		const page = await browser.newPage();
+		await page.setContent(`
       <!DOCTYPE html>
       <html lang="en">
         <head>
@@ -92,166 +92,165 @@ export async function getChartPic(data) {
       </html>
     `);
 
-    return page;
-  }
+		return page;
+	}
 
-  for (const chartType of chartTypes) {
-    const chartData = generateChartScript(data, chartType);
-    const page = await generateChartPage(chartData);
+	for (const chartType of chartTypes) {
+		const chartData = generateChartScript(data, chartType);
+		const page = await generateChartPage(chartData);
 
-    const logger = new DefaultLogger({name: "Benchmark"});
-    logger.warn(
-      `Ready to start taking screenshots of ${chartType}.png Chart...`
-    );
+		const logger = new DefaultLogger({ name: "Benchmark" });
+		logger.warn(
+			`Ready to start taking screenshots of ${chartType}.png Chart...`,
+		);
 
-    await new Promise((resolve) => setTimeout(() => resolve(true), 1000));
-    await page.screenshot({ path: `${chartType}.png` });
+		await new Promise((resolve) => setTimeout(() => resolve(true), 1000));
+		await page.screenshot({ path: `${chartType}.png` });
 
-    logger.info("Picture generated successfully！");
-  }
+		logger.info("Picture generated successfully！");
+	}
 
-  await browser.close();
+	await browser.close();
 }
 
 export async function deleteCacheFiles() {
-  const cacheFolderPaths = [
-    path.resolve(process.cwd(), "node_modules", ".cache"),
-    path.resolve(process.cwd(), "node_modules", ".farm"),
-    path.resolve(process.cwd(), "node_modules", ".vite"),
-    path.resolve(process.cwd(), ".next"),
-  ];
+	const cacheFolderPaths = [
+		path.resolve(process.cwd(), "node_modules", ".cache"),
+		path.resolve(process.cwd(), "node_modules", ".farm"),
+		path.resolve(process.cwd(), "node_modules", ".vite"),
+		path.resolve(process.cwd(), ".next"),
+	];
 
-  await Promise.all(
-    cacheFolderPaths.map(async (folderPath) => {
-      if (await folderExists(folderPath)) {
-        try {
-          await rmSync(folderPath, { recursive: true });
-          logger.info(`Deleted cache folder: ${folderPath}`);
-        } catch (err) {
-          logger.error(
-            `Error deleting cache folder ${folderPath}: ${err.message}`
-          );
-        }
-      } else {
-        logger.warn(`Cache folder does not exist: ${folderPath}`);
-      }
-    })
-  );
+	await Promise.all(
+		cacheFolderPaths.map(async (folderPath) => {
+			if (await folderExists(folderPath)) {
+				try {
+					await rmSync(folderPath, { recursive: true });
+					logger.info(`Deleted cache folder: ${folderPath}`);
+				} catch (err) {
+					logger.error(
+						`Error deleting cache folder ${folderPath}: ${err.message}`,
+					);
+				}
+			} else {
+				logger.warn(`Cache folder does not exist: ${folderPath}`);
+			}
+		}),
+	);
 
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export async function folderExists(path) {
-  try {
-    await statSync(path);
-    return true;
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      return false;
-    } else {
-      throw err;
-    }
-  }
+	try {
+		await statSync(path);
+		return true;
+	} catch (err) {
+		if (err.code === "ENOENT") {
+			return false;
+		}
+		throw err;
+	}
 }
 
 export function mergeVersions(data, mainVersion, hotVersion) {
-  if (!(mainVersion in data) || !(hotVersion in data)) {
-    logger.error("not found mainVersion or hotVersion");
-    return;
-  }
+	if (!(mainVersion in data) || !(hotVersion in data)) {
+		logger.error("not found mainVersion or hotVersion");
+		return;
+	}
 
-  const mainData = data[mainVersion];
-  const hotData = data[hotVersion];
+	const mainData = data[mainVersion];
+	const hotData = data[hotVersion];
 
-  const mergedVersion = {
-    ...mainData,
-  };
+	const mergedVersion = {
+		...mainData,
+	};
 
-  for (const key in hotData) {
-    if (!(key in mainData) || key.endsWith("(Hot)")) {
-      mergedVersion[key] = hotData[key];
-    }
-  }
+	for (const key in hotData) {
+		if (!(key in mainData) || key.endsWith("(Hot)")) {
+			mergedVersion[key] = hotData[key];
+		}
+	}
 
-  mergedVersion["hotBuildTime"] = hotData["buildTime"];
+	mergedVersion.hotBuildTime = hotData.buildTime;
 
-  const startupKey = "hotStartup(serverStartTime + onLoadTime)";
-  const hotStartupKey = "startup(serverStartTime + onLoadTime)";
-  mergedVersion[startupKey] = hotData[hotStartupKey];
+	const startupKey = "hotStartup(serverStartTime + onLoadTime)";
+	const hotStartupKey = "startup(serverStartTime + onLoadTime)";
+	mergedVersion[startupKey] = hotData[hotStartupKey];
 
-  delete data[mainVersion];
-  delete data[hotVersion];
+	delete data[mainVersion];
+	delete data[hotVersion];
 
-  data[mainVersion] = mergedVersion;
+	data[mainVersion] = mergedVersion;
 }
 
 export function mergeAllVersions(data) {
-  const versionArray = Object.keys(data);
-  for (let i = 1; i < versionArray.length; i += 2) {
-    const mainVersion = versionArray[i - 1];
-    const hotVersion = versionArray[i];
-    mergeVersions(data, mainVersion, hotVersion);
-  }
+	const versionArray = Object.keys(data);
+	for (let i = 1; i < versionArray.length; i += 2) {
+		const mainVersion = versionArray[i - 1];
+		const hotVersion = versionArray[i];
+		mergeVersions(data, mainVersion, hotVersion);
+	}
 }
 
 function generateChartScript(data, type) {
-  let fData = [];
-  switch (type) {
-    case "full":
-      fData = Object.keys(data).map((key) => ({
-        [key]: {
-          "startup(serverStartTime + onLoadTime)":
-            data[key]["startup(serverStartTime + onLoadTime)"],
-          rootHmr: data[key]["rootHmr"],
-          leafHmr: data[key]["leafHmr"],
-          buildTime: data[key]["buildTime"],
-          hotBuildTime: data[key]["hotBuildTime"],
-          "hotStartup(serverStartTime + onLoadTime)":
-            data[key]["hotStartup(serverStartTime + onLoadTime)"],
-        },
-      }));
-      break;
-    case "hmr":
-      fData = Object.keys(data).map((key) => ({
-        [key]: {
-          rootHmr: data[key]["rootHmr"],
-          leafHmr: data[key]["leafHmr"],
-        },
-      }));
-      break;
+	let fData = [];
+	switch (type) {
+		case "full":
+			fData = Object.keys(data).map((key) => ({
+				[key]: {
+					"startup(serverStartTime + onLoadTime)":
+						data[key]["startup(serverStartTime + onLoadTime)"],
+					rootHmr: data[key].rootHmr,
+					leafHmr: data[key].leafHmr,
+					buildTime: data[key].buildTime,
+					hotBuildTime: data[key].hotBuildTime,
+					"hotStartup(serverStartTime + onLoadTime)":
+						data[key]["hotStartup(serverStartTime + onLoadTime)"],
+				},
+			}));
+			break;
+		case "hmr":
+			fData = Object.keys(data).map((key) => ({
+				[key]: {
+					rootHmr: data[key].rootHmr,
+					leafHmr: data[key].leafHmr,
+				},
+			}));
+			break;
 
-    case "startup":
-      fData = Object.keys(data).map((key) => ({
-        [key]: {
-          "startup(serverStartTime + onLoadTime)":
-            data[key]["startup(serverStartTime + onLoadTime)"],
-          "hotStartup(serverStartTime + onLoadTime)":
-            data[key]["hotStartup(serverStartTime + onLoadTime)"],
-        },
-      }));
-      break;
+		case "startup":
+			fData = Object.keys(data).map((key) => ({
+				[key]: {
+					"startup(serverStartTime + onLoadTime)":
+						data[key]["startup(serverStartTime + onLoadTime)"],
+					"hotStartup(serverStartTime + onLoadTime)":
+						data[key]["hotStartup(serverStartTime + onLoadTime)"],
+				},
+			}));
+			break;
 
-    case "build":
-      fData = Object.keys(data).map((key) => ({
-        [key]: {
-          buildTime: data[key]["buildTime"],
-          hotBuildTime: data[key]["hotBuildTime"],
-        },
-      }));
-      break;
+		case "build":
+			fData = Object.keys(data).map((key) => ({
+				[key]: {
+					buildTime: data[key].buildTime,
+					hotBuildTime: data[key].hotBuildTime,
+				},
+			}));
+			break;
 
-    default:
-      fData = [];
-  }
-  return fData.reduce((result, item) => {
-    const key = Object.keys(item)[0];
-    result[key] = item[key];
-    return result;
-  }, {});
+		default:
+			fData = [];
+	}
+	return fData.reduce((result, item) => {
+		const key = Object.keys(item)[0];
+		result[key] = item[key];
+		return result;
+	}, {});
 }
 
 export function randomColor() {
-  return `rgba(${Math.round(Math.random() * 255)},${Math.round(
-    Math.random() * 255
-  )},${Math.round(Math.random() * 255)},0.8)`;
+	return `rgba(${Math.round(Math.random() * 255)},${Math.round(
+		Math.random() * 255,
+	)},${Math.round(Math.random() * 255)},0.8)`;
 }

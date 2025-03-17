@@ -2,45 +2,56 @@
 
 Benchmarks for [Farm](https://github.com/farm-fe/farm), Rsbuild, Webpack, Vite
 
-> Using Turbopack's bench cases (1000 React components), see https://turbo.build/pack/docs/benchmarks
+> Using Turbopack's bench cases (1000 React components), see
+> https://turbo.build/pack/docs/benchmarks
 
-> The `startup time` algorithm is the compilation time plus the time from browser loading to page rendering on the browser
+> The `startup time` algorithm is the compilation time plus the time from
+> browser loading to page rendering on the browser
 
-> [!IMPORTANT]
-> **Tips:** 
-Farm compiled a write with incremental cache for the first time, The time to write the cache in the current warehouse module configuration is approximately 200ms,
-Rsbuild currently has no caching mechanism, so we provide second pass compilation data by default
-Later, we can wait for rspack to implement incremental caching and then we can re-separate the entire data,(the second compilation with caching and the first compilation without caching)
+> [!IMPORTANT] > **Tips:** Farm compiled a write with incremental cache for the first time, The
+> time to write the cache in the current warehouse module configuration is
+> approximately 200ms, Rsbuild currently has no caching mechanism, so we provide
+> second pass compilation data by default Later, we can wait for rspack to
+> implement incremental caching and then we can re-separate the entire data,(the
+> second compilation with caching and the first compilation without caching)
 
 <!-- > Tested on Linux Mint, 11th Gen Intel(R) Core(TM) i5-11400 @ 2.60GHz, 16GB -->
-> Tested on Macos M1 Pro
 
-|            framework        | startup | serverStartTime | onLoadTime | rootHmr | leafHmr | buildTime |
-|-------------------------------|---------------------------------------|-----------------|------------|---------|---------|-----------|
-|          Farm 1.3.22           |                481ms               |     322ms     |  159ms   | 32ms  | 44ms  |  651ms  |
-|       Farm 1.3.22 (Hot)        |                258ms               |     120ms     |  138ms   | 27ms  | 45ms  |  210ms  |
-|        Rsbuild 1.0.5         |                417ms                |     250ms     |  167ms   | 82ms  | 85ms  |  320ms  |
-|     Rsbuild 1.0.5 (Hot)      |                382ms               |     210ms     |  172ms   | 111ms  | 74ms  |  280ms  |
-|    Vite 6.0.0-alpha (swc)     |               1716ms                |     142ms     |  1574ms  | 114ms  | 123ms  | 1260ms  |
-|  Vite 6.0.0-alpha (swc)(Hot)  |               1077ms                |     114ms     |  963ms  | 34ms  | 17ms  | 1340ms  |
-|   Vite 6.0.0-alpha (babel)    |               2838ms                |     126ms     |  2712ms  | 28ms  | 28ms  | 1390ms  |
-| Vite 6.0.0-alpha (babel)(Hot) |               2563ms                |     111ms     |  2452ms  | 138ms  | 122ms  | 1310ms  |
-|     Webpack 5.91.0 (swc)      |               1926ms                |    1591ms     |  335ms   | 588ms | 158ms | 4144ms  |
-|   Webpack 5.91.0 (swc)(Hot)   |                851ms                |     557ms     |  294ms   | 242ms | 216ms |  483ms  |
-|    Webpack 5.91.0 (babel)     |               5607ms                |    5307ms     |  300ms   | 226ms | 171ms |  460ms  |
-|  Webpack 5.91.0 (babel)(Hot)  |               1083ms                |     827ms     |  256ms   | 260ms | 163ms |  481ms  |
+> Tested on a 12 core AMD EPYC 9634 84-Core Processor - 32GB
 
+```bash
+┌─────────────────────────────┬───────────────────────────────────────┬─────────────────┬────────────┬─────────┬─────────┬───────────┐
+│ (index)                     │ startup(serverStartTime + onLoadTime) │ serverStartTime │ onLoadTime │ rootHmr │ leafHmr │ buildTime │
+├─────────────────────────────┼───────────────────────────────────────┼─────────────────┼────────────┼─────────┼─────────┼───────────┤
+│ Farm 1.7.1                  │ '578ms'                               │ '384ms'         │ '193ms'    │ '15ms'  │ '14ms'  │ '704ms'   │
+│ Farm 1.7.1 (Hot)            │ '440ms'                               │ '246ms'         │ '194ms'    │ '16ms'  │ '13ms'  │ '354ms'   │
+│ Rsbuild 1.2.19              │ '445ms'                               │ '233ms'         │ '212ms'    │ '112ms' │ '92ms'  │ '496ms'   │
+│ Rsbuild 1.2.19 (Hot)        │ '440ms'                               │ '230ms'         │ '210ms'    │ '106ms' │ '98ms'  │ '500ms'   │
+│ Vite 6.2.2 (swc)            │ '1784ms'                              │ '155ms'         │ '1629ms'   │ '26ms'  │ '14ms'  │ '1933ms'  │
+│ Vite 6.2.2 (swc)(Hot)       │ '1451ms'                              │ '157ms'         │ '1294ms'   │ '31ms'  │ '14ms'  │ '1973ms'  │
+│ Vite 6.2.2 (babel)          │ '3229ms'                              │ '180ms'         │ '3049ms'   │ '23ms'  │ '17ms'  │ '1893ms'  │
+│ Vite 6.2.2 (babel)(Hot)     │ '3021ms'                              │ '149ms'         │ '2872ms'   │ '37ms'  │ '14ms'  │ '1876ms'  │
+│ Webpack 5.98.0 (swc)        │ '2356ms'                              │ '1987ms'        │ '369ms'    │ '484ms' │ '218ms' │ '6272ms'  │
+│ Webpack 5.98.0 (swc)(Hot)   │ '1265ms'                              │ '897ms'         │ '367ms'    │ '321ms' │ '219ms' │ '709ms'   │
+│ Webpack 5.98.0 (babel)      │ '8701ms'                              │ '8358ms'        │ '342ms'    │ '605ms' │ '240ms' │ '700ms'   │
+│ Webpack 5.98.0 (babel)(Hot) │ '1472ms'                              │ '1144ms'        │ '328ms'    │ '325ms' │ '221ms' │ '686ms'   │
+└─────────────────────────────┴───────────────────────────────────────┴─────────────────┴────────────┴─────────┴─────────┴───────────┘
+```
 
 ### Full Benchmark
+
 ![xx](./full.png)
 
 ### StartUp Benchmark
+
 ![xx](./startup.png)
 
 ### HMR Benchmark
+
 ![xx](./hmr.png)
 
 ### Production Build Benchmark
+
 ![xx](./build.png)
 
 Run benchmarks:
@@ -74,11 +85,6 @@ Rspack  Leaf HMR time: 303ms
 If you want to start the project with the specified tool, try:
 
 ```bash
-pnpm i # install dependencies
-
-npm run start # Start Farm
-npm run start:vite # Start Vite
-npm run start:webpack # Start Webpack
-npm run start:rspack # Start Rspack
-npm run start:turbopack # Start Turbopack
+bun i # install dependencies
+bun run benchmark # Run benchmark
 ```

@@ -1,4 +1,4 @@
 {
-  "moduleIdStrategy": "hashed",
-  "optimization": { "concatenateModules": true }
+	"moduleIdStrategy": "hashed",
+	"optimization": { "concatenateModules": true }
 }
