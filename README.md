@@ -8,12 +8,13 @@ Benchmarks for [Farm](https://github.com/farm-fe/farm), Rsbuild, Webpack, Vite
 > The `startup time` algorithm is the compilation time plus the time from
 > browser loading to page rendering on the browser
 
-> [!IMPORTANT] > **Tips:** Farm compiled a write with incremental cache for the first time, The
-> time to write the cache in the current warehouse module configuration is
-> approximately 200ms, Rsbuild currently has no caching mechanism, so we provide
-> second pass compilation data by default Later, we can wait for rspack to
-> implement incremental caching and then we can re-separate the entire data,(the
-> second compilation with caching and the first compilation without caching)
+> [!IMPORTANT] > **Tips:** Farm compiled a write with incremental cache for the
+> first time, The time to write the cache in the current warehouse module
+> configuration is approximately 200ms, Rsbuild currently has no caching
+> mechanism, so we provide second pass compilation data by default Later, we can
+> wait for rspack to implement incremental caching and then we can re-separate
+> the entire data,(the second compilation with caching and the first compilation
+> without caching)
 
 <!-- > Tested on Linux Mint, 11th Gen Intel(R) Core(TM) i5-11400 @ 2.60GHz, 16GB -->
 
